@@ -4,6 +4,18 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
 
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.log('Error connecting to MongoDB:', err);
+  });
+
+
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
@@ -52,4 +64,16 @@ const listener = app.listen(process.env.PORT || 3000, function () {
   }
 });
 
+const helmet = require("helmet");
+app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    styleSrc: ["'self'"],
+    scriptSrc: ["'self'"]
+  }
+}));
+
+
 module.exports = app; //for testing
+
